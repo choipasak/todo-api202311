@@ -1,6 +1,7 @@
 package com.example.todo.todoapi.service;
 
 import com.example.todo.todoapi.dto.request.TodoCreateRequestDTO;
+import com.example.todo.todoapi.dto.request.TodoModifyRequestDTO;
 import com.example.todo.todoapi.dto.response.TodoDetailResponseDTO;
 import com.example.todo.todoapi.dto.response.TodoListResponseDTO;
 import com.example.todo.todoapi.entity.Todo;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,4 +52,28 @@ public class TodoService {
                 .build();
     }
 
+    public TodoListResponseDTO delete(final String todoId) {
+        try {
+            todoRepository.deleteById(todoId);
+        } catch (Exception e) {
+            log.error("id가 존재하지 않아 삭제에 실패했습니다. - ID: {}, err: {}"
+                    , todoId, e.getMessage());
+            throw new RuntimeException("id가 존재하지 않아 삭제에 실패했습니다.");
+        }
+
+        return retrieve(); // 글 전체 목록 리턴 메서드
+    }
+
+    public TodoListResponseDTO update(final TodoModifyRequestDTO requestDTO) throws Exception{
+        // 조회 하고 저장 하는 방식임
+        Optional<Todo> targetEntity = todoRepository.findById(requestDTO.getId());
+        targetEntity.ifPresent(todo -> {
+            //setter를 이용해서 받은 값을 DB의 done 값에 넣어주기. (뒤집는 처리는 화면단에서 할 것임)
+            todo.setDone(requestDTO.isDone());
+
+            todoRepository.save(todo); // 여기서 todo는 조회해온 값 + 수정
+        });
+
+        return  retrieve();
+    }
 }
