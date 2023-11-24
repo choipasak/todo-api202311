@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 @Builder
 public class TodoCreateRequestDTO {
 
+    // title이 json객체로 포장되어서 올 것이다.
     @NotBlank
     @Size(min = 2, max = 30)
     private String title;
