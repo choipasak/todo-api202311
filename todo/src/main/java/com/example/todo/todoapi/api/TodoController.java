@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/todos")
+@CrossOrigin(origins = "http://localhost:3000")
 public class TodoController {
 
     private final TodoService todoService;
@@ -64,7 +65,6 @@ public class TodoController {
     }
 
     // 할 일 삭제 요청
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTodo(
             @PathVariable("id") String todoId

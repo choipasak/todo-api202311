@@ -11,5 +11,9 @@
         <module name="todo.todo.main~1" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="todo.todo.main" target="11" />
+      <module name="todo.todo.test" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>
