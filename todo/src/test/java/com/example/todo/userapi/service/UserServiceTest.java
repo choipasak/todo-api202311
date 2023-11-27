@@ -35,6 +35,7 @@ class UserServiceTest {
 
         // param1: 어떤 에러가 발생할지 에러 클래스를 작성.
         // param2: 에러가 발생하는 상황을 전달.
+        // assertThrows: 에러가 나면 테스트 통과 시켜주는 assertion
         assertThrows(RuntimeException.class
         , () -> userService.create(dto));
     }

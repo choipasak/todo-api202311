@@ -26,8 +26,7 @@ public class TodoService {
     @Autowired
     private final TodoRepository todoRepository;
 
-
-    // 매개 변수에 final -> 컨트롤러가 전달해준 값을 서비스에서 변경할 수 없다. 불변값이다
+    // 매개 변수에 final -> 컨트롤러가 전달해준 값을 서비스에서 변경할 수 없다. 불변 값이다
     public TodoListResponseDTO create(final TodoCreateRequestDTO requestDTO) throws Exception{
 
         // 입력한 게시글 등록

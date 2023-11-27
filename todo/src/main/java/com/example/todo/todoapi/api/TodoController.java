@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/todos")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin("*")
 public class TodoController {
 
     private final TodoService todoService;
@@ -26,7 +26,7 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<?> createTodo(
             @Validated @RequestBody TodoCreateRequestDTO requestDTO,
-            BindingResult result // json객체로 받은 결과를 담는 객체 / 검증오류를 보관하는 객체다.
+            BindingResult result // json 객체로 받은 결과를 담는 객체 / 검증 오류를 보관하는 객체다.
     ){
 
         if(result.hasErrors()){
