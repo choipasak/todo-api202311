@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/todos")
-@CrossOrigin("*")
+@CrossOrigin
 public class TodoController {
 
     private final TodoService todoService;
@@ -26,7 +26,7 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<?> createTodo(
             @Validated @RequestBody TodoCreateRequestDTO requestDTO,
-            BindingResult result // json 객체로 받은 결과를 담는 객체 / 검증 오류를 보관하는 객체다.
+            BindingResult result // json 객체로 받은 결과를 담는 객체 / 검증 오류를 보관 하는 객체다.
     ){
 
         if(result.hasErrors()){
@@ -52,8 +52,8 @@ public class TodoController {
         }
     }
 
-    // 페이지에 들어오면 할 일 목록을 띄워주기 위해 들어오는 요청
-    // put: 통채로 하는느낌
+    // 페이지에 들어 오면 할 일 목록을 띄워 주기 위해 들어 오는 요청
+    // put: 통채로 하는 느낌
     // fetch: 한 부분만 하는 느낌
     @GetMapping
     public ResponseEntity<?> retrieveTodoList(){
@@ -109,17 +109,5 @@ public class TodoController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(TodoListResponseDTO.builder().error(e.getMessage()).build());
         }
-
     }
-
-
 }
-
-
-
-
-
-
-
-
-

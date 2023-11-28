@@ -1,6 +1,7 @@
 package com.example.todo.userapi.entity;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -35,5 +36,10 @@ public class User
 
     @CreationTimestamp
     private LocalDateTime joinDate;
+
+    @Enumerated(EnumType.STRING) // EnumType.ORDINAL: DB에 0, 1, 2 같이 값이 들어간다.
+    // @ColumnDefault("'COMMON'") // 안쪽의 '' 이유: ENUM타입이어서. | 주석 처리 이유: DB에 null로 들어감
+    @Builder.Default
+    private Role role = Role.COMMON; // 유저 권한 등급
 
 }
