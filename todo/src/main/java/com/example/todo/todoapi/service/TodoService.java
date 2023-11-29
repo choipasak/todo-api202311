@@ -7,6 +7,7 @@ import com.example.todo.todoapi.dto.response.TodoDetailResponseDTO;
 import com.example.todo.todoapi.dto.response.TodoListResponseDTO;
 import com.example.todo.todoapi.entity.Todo;
 import com.example.todo.todoapi.repository.TodoRepository;
+import com.example.todo.userapi.entity.Role;
 import com.example.todo.userapi.entity.User;
 import com.example.todo.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,18 +33,25 @@ public class TodoService {
 
     // 매개 변수에 final -> 컨트롤러가 전달해준 값을 서비스에서 변경할 수 없다. 불변 값이다
     public TodoListResponseDTO create(final TodoCreateRequestDTO requestDTO,
-                                      final String userId
+                                      final TokenUserInfo userInfo
     ) throws Exception{
 
 
-        User user = getUser(userId);
+        User user = getUser(userInfo.getUserId());
+        // - 권한에 따른 글쓰기 제한 처리
+        // 일반 회원이 일정을 5개 초과해서 작성하면 예외를 발생.
+        if(userInfo.getRole() == Role.COMMON && todoRepository.countByUser(user) >= 5){
+            // COMMON은 일정 5개까지만 작성가능, 프리미엄 제안
+            throw new IllegalArgumentException("COMMON회원 등급은 더 이상 일정을 작성할 수 없습니다.");
+        }
+
         // 이제는 할 일 등록은 회원만 할 수 있도록 세팅하기 때문에
         // toEntity의 매개 값으로 User 엔터티도 함께 전달해야 합니다 -> userId로 회원 엔터티를 조회해야 함.
         // 입력한 게시글 등록
         todoRepository.save(requestDTO.toEntity(user)); // save가 에러를 발생시킬 수도 있음 + 이제는 user 정보도 필요
         log.info("할 일 저장 완료! 제목: {}", requestDTO.getTitle());
 
-        return retrieve(userId);
+        return retrieve(userInfo.getUserId());
     }
 
     // 글 전체 목록 조회해서 가져온 후 리턴하는 메서드 (2번 이상 사용해서 메서드로 추출)

@@ -7,6 +7,7 @@ import com.example.todo.todoapi.dto.response.TodoListResponseDTO;
 import com.example.todo.todoapi.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -43,8 +44,11 @@ public class TodoController {
         // TodoListResponseDTO -> 글 하나를 담는 DTO객체
         try {
             // create메서드 내부의 save메서드가 에러를 발생 시킬 수도 있어서 컨트롤러에서 받아줌
-            TodoListResponseDTO responseDTO = todoService.create(requestDTO, userInfo.getUserId());
+            TodoListResponseDTO responseDTO = todoService.create(requestDTO, userInfo);
             return ResponseEntity.ok().body(responseDTO); // 서비스에서 받은 TodoListResponseDTO의 결과
+        } catch (IllegalArgumentException e){
+            // 권한 때문에 발생한 예외
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity

@@ -3,6 +3,8 @@ package com.example.todo.config;
 import com.example.todo.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +16,8 @@ import org.springframework.web.filter.CorsFilter;
 // @Configuration // 설정 클래스 용도로 사용하도록 스프링에 등록하는 아노테이션
 @EnableWebSecurity // 시큐리티 설정 파일로 사용할 클래스 선언.
 @RequiredArgsConstructor
+// 자동 권한 검사를 수행하기 위한 설정
+@EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -39,6 +43,14 @@ public class WebSecurityConfig {
                 // 여기서부터 어떤 요청을 인증 안 할 것인지, 언제 인증을 할 것인지 설정 -> 정해져 있음
                 .authorizeRequests()
                 // antMatchers(): '/api/auth'로 시작하는 요청과 '/'요청은 권한 검사 없이 허용하겠다. 라는 뜻임
+                /*
+                    1. /api/auth/**는 모든 경로를 통과시켜 줌
+                    2. /api/auth/promote는 아무런 토큰에 대한 검증 검사가 없음
+                      그래서 1보다 위에 작성 해 주고 먼저 막아줘야 한다.
+                    - 정리
+                    /api/auth/** 은 permitAll() 이지만, /promote는 검증이 필요하기 때문에 추가 (작성 순서 조심!)
+                */
+                .antMatchers(HttpMethod.PUT, "/api/auth/promote").authenticated()
                 .antMatchers("/", "/api/auth/**").permitAll() // permitAll(): 모두 인증시키겠다.
                 // '/api/todos'라는 요청이 POST로 들어오고, Role 값이 ADMIN인 경우 권한 검사 없이 허용하겠다.
                 // .antMatchers(HttpMethod.POST, "/api/todos").hasRole("ADMIN")
