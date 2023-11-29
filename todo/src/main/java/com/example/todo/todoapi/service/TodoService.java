@@ -1,11 +1,14 @@
 package com.example.todo.todoapi.service;
 
+import com.example.todo.auth.TokenUserInfo;
 import com.example.todo.todoapi.dto.request.TodoCreateRequestDTO;
 import com.example.todo.todoapi.dto.request.TodoModifyRequestDTO;
 import com.example.todo.todoapi.dto.response.TodoDetailResponseDTO;
 import com.example.todo.todoapi.dto.response.TodoListResponseDTO;
 import com.example.todo.todoapi.entity.Todo;
 import com.example.todo.todoapi.repository.TodoRepository;
+import com.example.todo.userapi.entity.User;
+import com.example.todo.userapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -23,23 +26,34 @@ import java.util.stream.Collectors;
 @Transactional
 public class TodoService {
 
-    @Autowired
+
     private final TodoRepository todoRepository;
+    private final UserRepository userRepository;
 
     // 매개 변수에 final -> 컨트롤러가 전달해준 값을 서비스에서 변경할 수 없다. 불변 값이다
-    public TodoListResponseDTO create(final TodoCreateRequestDTO requestDTO) throws Exception{
+    public TodoListResponseDTO create(final TodoCreateRequestDTO requestDTO,
+                                      final String userId
+    ) throws Exception{
 
+
+        User user = getUser(userId);
+        // 이제는 할 일 등록은 회원만 할 수 있도록 세팅하기 때문에
+        // toEntity의 매개 값으로 User 엔터티도 함께 전달해야 합니다 -> userId로 회원 엔터티를 조회해야 함.
         // 입력한 게시글 등록
-        todoRepository.save(requestDTO.toEntity()); // save가 에러를 발생시킬 수도 있음
+        todoRepository.save(requestDTO.toEntity(user)); // save가 에러를 발생시킬 수도 있음 + 이제는 user 정보도 필요
         log.info("할 일 저장 완료! 제목: {}", requestDTO.getTitle());
 
-        return retrieve();
+        return retrieve(userId);
     }
 
     // 글 전체 목록 조회해서 가져온 후 리턴하는 메서드 (2번 이상 사용해서 메서드로 추출)
     // 컨트롤러에서 페이지 들어오면 바로 글 목록 띄워주는(GET요청) 기능을 서비스에서 메서드로 사용 가능(private -> public)
-    public TodoListResponseDTO retrieve() {
-        List<Todo> entityList = todoRepository.findAll(); // (페이징 없는)전체 목록 조회 결과
+    public TodoListResponseDTO retrieve(String userId) {
+
+        // 로그인 한 유저의 정보를 DB에서 조회
+        User user = getUser(userId);
+
+        List<Todo> entityList = todoRepository.findAllByUser(user); // (페이징 없는)전체 목록 조회 결과
         // Todo 엔터티를 TodoListResponseDTO로 변경해 줘야함. 그래야 TodoListResponseDTO에 담아서 리턴이 가능해짐
         List<TodoDetailResponseDTO> dtoList = entityList.stream()
                 // .map(todo -> new TodoListResponseDTO(todo))
@@ -51,7 +65,14 @@ public class TodoService {
                 .build();
     }
 
-    public TodoListResponseDTO delete(final String todoId) {
+    private User getUser(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new RuntimeException("회원 정보가 없습니다.")
+        );
+        return user;
+    }
+
+    public TodoListResponseDTO delete(final String todoId, final String userId) {
         try {
             todoRepository.deleteById(todoId);
         } catch (Exception e) {
@@ -60,10 +81,10 @@ public class TodoService {
             throw new RuntimeException("id가 존재하지 않아 삭제에 실패했습니다.");
         }
 
-        return retrieve(); // 글 전체 목록 리턴 메서드
+        return retrieve(userId); // (userId)의 글 전체 목록 리턴 메서드
     }
 
-    public TodoListResponseDTO update(final TodoModifyRequestDTO requestDTO) throws Exception{
+    public TodoListResponseDTO update(final TodoModifyRequestDTO requestDTO, final String userId) throws Exception{
         // 조회 하고 저장 하는 방식임
         Optional<Todo> targetEntity = todoRepository.findById(requestDTO.getId());
         targetEntity.ifPresent(todo -> {
@@ -73,6 +94,6 @@ public class TodoService {
             todoRepository.save(todo); // 여기서 todo는 조회해온 값 + 수정
         });
 
-        return  retrieve();
+        return  retrieve(userId);
     }
 }

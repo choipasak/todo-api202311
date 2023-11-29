@@ -21,16 +21,19 @@ public class LoginResponseDTO {
     
     @JsonFormat(pattern = "yyyy년 MM월 dd일")
     private LocalDate joinDate;
-    
-    private String token; // 인증 토큰
-//    private String message; // 로그인 메세지
 
+    private String token; // 인증 토큰
+    private String role; // 권한
+    
+    
     public LoginResponseDTO(User user, String token) {
 
         this.email = user.getEmail();
         this.userName = user.getUserName();
         this.joinDate = LocalDate.from(user.getJoinDate());
         this.token = token;
+        this.role = String.valueOf(user.getRole());
 
     }
+
 }
