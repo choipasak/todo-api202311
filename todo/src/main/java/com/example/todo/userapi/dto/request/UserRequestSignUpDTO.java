@@ -28,11 +28,12 @@ public class UserRequestSignUpDTO {
     private String userName;
 
     // dto->Entity 변경해주는 toEntity 메서드 작성
-    public User toEntity(){
+    public User toEntity(String uploadedFilePath){
         return User.builder()
                 .email(this.email)
-                .passWord(this.password)
+                .password(this.password)
                 .userName(this.userName)
+                .profileImg(uploadedFilePath)
                 .build();
     }
 }

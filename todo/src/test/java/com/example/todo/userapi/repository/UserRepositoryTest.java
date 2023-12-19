@@ -26,7 +26,7 @@ class UserRepositoryTest {
         //given
         User newUser = User.builder()
                 .email("abc123@abc.com")
-                .passWord("1234")
+                .password("1234")
                 .userName("송아지")
                 .build();
         //when

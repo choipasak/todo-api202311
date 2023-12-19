@@ -17,27 +17,23 @@ class UserServiceTest {
 
     @Autowired
     UserService userService;
-    
+
     @Test
-    @DisplayName("중복된 이메일로 회원가입을 시도하면 RuntimeException이 발생해야 한다.")
+    @DisplayName("중복된 이메일로 회원가입을 시도하면 " +
+            "RuntimeException이 발생해야 한다.")
     void validateEmailTest() {
         //given
-        String email = "abc123@abc.com";
+        String email = "abc1234@abc.com";
 
         UserRequestSignUpDTO dto = UserRequestSignUpDTO.builder()
                 .email(email)
-                .password("asdf")
-                .userName("asdfasdf")
+                .password("wewrlkwrlk")
+                .userName("jfwj")
                 .build();
-
         //when
         //then
-
-        // param1: 어떤 에러가 발생할지 에러 클래스를 작성.
-        // param2: 에러가 발생하는 상황을 전달.
-        // assertThrows: 에러가 나면 테스트 통과 시켜주는 assertion
-        assertThrows(RuntimeException.class
-        , () -> userService.create(dto));
+        // param1: 어떤 에러가 발생할지 에러 클래스를 적음.
+        // param2:  에러가 발생하는 상황을 전달.
+        assertThrows(RuntimeException.class, () -> userService.create(dto, ""));
     }
-
 }

@@ -38,7 +38,7 @@ public class TokenProvider {
 
         // 토큰 만료시간 생성
         Date expiry = Date.from(
-                // LocalDateTime으로 만들어야 했지만 귀찮아서 그냥 Date객체를 사용 함.
+                // LocalDateTime으로 만들어야 했지만 귀찮아서 그냥 Date객체를 사용 함 -> 잘못쓴듯
                 // 밑의 setExpiration()가 자바 Util의 Date객체만 받을 수 있음
                 Instant.now().plus(1, ChronoUnit.DAYS)
                 // 하루 짜리 토큰임. 다음 날이면 만료 되서 소멸 된다!
